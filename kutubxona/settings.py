@@ -1,20 +1,18 @@
 """
 Django settings for kutubxona project.
+Production (Vercel) + Development (local) uchun sozlamalar.
 """
 
 import os
 from pathlib import Path
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get(
     'SECRET_KEY',
     'django-insecure-kutubxona-secret-key-change-in-production-2024'
 )
 
-# DEBUG: production'da False bo'lishi kerak
 DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
 ALLOWED_HOSTS = [
@@ -25,7 +23,6 @@ ALLOWED_HOSTS = [
     '*',
 ]
 
-# Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -38,7 +35,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',  # WhiteNoise static files
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -67,16 +64,23 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'kutubxona.wsgi.application'
 
-# Database
-# Vercel'da PostgreSQL ishlatish uchun DATABASE_URL env variable
-DATABASE_URL = os.environ.get('DATABASE_URL')
+# ------------------------------------------------------------------ #
+#  Database — PostgreSQL (Vercel) yoki SQLite (local)                 #
+# ------------------------------------------------------------------ #
+DATABASE_URL = os.environ.get('DATABASE_URL', '')
 
 if DATABASE_URL:
+    # Vercel Postgres yoki boshqa PostgreSQL
     import dj_database_url
     DATABASES = {
-        'default': dj_database_url.parse(DATABASE_URL)
+        'default': dj_database_url.config(
+            default=DATABASE_URL,
+            conn_max_age=600,
+            ssl_require=True,
+        )
     }
 else:
+    # Local development — SQLite
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
@@ -84,55 +88,52 @@ else:
         }
     }
 
-# Password validation
+# ------------------------------------------------------------------ #
+#  Password validation                                                 #
+# ------------------------------------------------------------------ #
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
     {
         'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-        'OPTIONS': {
-            'min_length': 8,
-        }
+        'OPTIONS': {'min_length': 8},
     },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
-# Internationalization
+# ------------------------------------------------------------------ #
+#  Internationalization                                                #
+# ------------------------------------------------------------------ #
 LANGUAGE_CODE = 'uz-uz'
 TIME_ZONE = 'Asia/Tashkent'
 USE_I18N = True
 USE_TZ = True
 
-# Static files
+# ------------------------------------------------------------------ #
+#  Static files — WhiteNoise                                          #
+# ------------------------------------------------------------------ #
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [BASE_DIR / 'static']
-
-# WhiteNoise static file compression
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# Media files
+# ------------------------------------------------------------------ #
+#  Media files                                                         #
+# ------------------------------------------------------------------ #
 MEDIA_ROOT = BASE_DIR / 'media'
 MEDIA_URL = '/media/'
 
-# Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Custom User Model
 AUTH_USER_MODEL = 'library.User'
 
-# Authentication URLs
+# Auth URLs
 LOGIN_URL = '/auth/login/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/auth/login/'
 
-# Messages framework
+# Messages
 from django.contrib.messages import constants as messages
 MESSAGE_TAGS = {
     messages.DEBUG: 'debug',
@@ -142,7 +143,7 @@ MESSAGE_TAGS = {
     messages.ERROR: 'error',
 }
 
-# Custom error handlers
+# Error handlers
 HANDLER404 = 'library.views.home_views.custom_404'
 HANDLER500 = 'library.views.home_views.custom_500'
 HANDLER403 = 'library.views.home_views.custom_403'
