@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="uz" class="">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}Online Kutubxona{% endblock %}</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          animation: {
+            'fade-in': 'fadeIn 0.3s ease-in-out',
+            'slide-in': 'slideIn 0.3s ease-out',
+          },
+          keyframes: {
+            fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
+            slideIn: { '0%': { transform: 'translateX(100%)', opacity: '0' }, '100%': { transform: 'translateX(0)', opacity: '1' } },
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    .book-card { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+    .book-card:hover { transform: translateY(-4px) scale(1.02); box-shadow: 0 20px 40px rgba(0,0,0,0.15); }
+    .toast { animation: slideIn 0.3s ease-out; }
+    #loading-overlay { display: none; }
+    #loading-overlay.active { display: flex; }
+  </style>
+
+  {% block extra_head %}{% endblock %}
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white transition-colors duration-200 min-h-screen">
+
+  <!-- Loading overlay -->
+  <div id="loading-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-[100] items-center justify-center">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl p-8 flex flex-col items-center gap-4 shadow-2xl">
+      <div class="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+      <p class="text-gray-700 dark:text-gray-300 font-medium">Yuklanmoqda...</p>
+    </div>
+  </div>
+
+  <!-- Navbar -->
+  {% include "partials/navbar.html" %}
+
+  <!-- Toast notifications container -->
+  <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2 max-w-sm w-full"></div>
+
+  <!-- Django messages → toast -->
+  {% if messages %}
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      {% for message in messages %}
+        showToast("{{ message|escapejs }}", "{{ message.tags }}");
+      {% endfor %}
+    });
+  </script>
+  {% endif %}
+
+  <!-- Main content -->
+  <main class="min-h-screen">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 mt-16">
+    <div class="max-w-7xl mx-auto px-4 py-8">
+      <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+        <div class="flex items-center gap-2">
+          <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+          </svg>
+          <span class="font-bold text-gray-800 dark:text-white">Online Kutubxona</span>
+        </div>
+        <p class="text-gray-500 dark:text-gray-400 text-sm">© 2026 Online Kutubxona Tizimi. Barcha huquqlar himoyalangan.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Dark/Light mode + Toast + Loading scripts -->
+  <script>
+    // Dark mode init
+    (function () {
+      const theme = localStorage.getItem('theme');
+      if (theme === 'dark') {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    })();
+
+    function toggleTheme() {
+      const html = document.documentElement;
+      if (html.classList.contains('dark')) {
+        html.classList.remove('dark');
+        localStorage.setItem('theme', 'light');
+      } else {
+        html.classList.add('dark');
+        localStorage.setItem('theme', 'dark');
+      }
+    }
+
+    // Toast notification system
+    function showToast(message, type = 'success', duration = 3000) {
+      const container = document.getElementById('toast-container');
+      const colors = {
+        success: 'bg-green-500',
+        error: 'bg-red-500',
+        warning: 'bg-yellow-500',
+        info: 'bg-blue-500',
+        debug: 'bg-gray-500',
+      };
+      const icons = {
+        success: '✓',
+        error: '✕',
+        warning: '⚠',
+        info: 'ℹ',
+        debug: '⚙',
+      };
+      const colorClass = colors[type] || colors.info;
+      const icon = icons[type] || icons.info;
+
+      const toast = document.createElement('div');
+      toast.className = `toast flex items-center gap-3 px-4 py-3 rounded-xl text-white shadow-lg ${colorClass} min-w-[280px]`;
+      toast.innerHTML = `
+        <span class="text-lg font-bold">${icon}</span>
+        <span class="flex-1 text-sm font-medium">${message}</span>
+        <button onclick="this.parentElement.remove()" class="text-white opacity-70 hover:opacity-100 text-lg leading-none">&times;</button>
+      `;
+      container.appendChild(toast);
+
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transition = 'opacity 0.3s';
+        setTimeout(() => toast.remove(), 300);
+      }, duration);
+    }
+
+    // Loading overlay
+    function showLoading() {
+      document.getElementById('loading-overlay').classList.add('active');
+    }
+    function hideLoading() {
+      document.getElementById('loading-overlay').classList.remove('active');
+    }
+
+    // Form submit loading
+    document.addEventListener('DOMContentLoaded', function() {
+      document.querySelectorAll('form[data-loading]').forEach(form => {
+        form.addEventListener('submit', showLoading);
+      });
+    });
+  </script>
+
+  {% block extra_scripts %}{% endblock %}
+</body>
+</html>

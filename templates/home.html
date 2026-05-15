@@ -1,0 +1,191 @@
+{% extends "base.html" %}
+
+{% block title %}Online Kutubxona — Bosh sahifa{% endblock %}
+
+{% block content %}
+
+<!-- Hero Section -->
+<section class="relative bg-gradient-to-br from-blue-600 via-indigo-700 to-purple-800 text-white overflow-hidden">
+  <div class="absolute inset-0 opacity-10">
+    <div class="absolute top-10 left-10 w-72 h-72 bg-white rounded-full blur-3xl"></div>
+    <div class="absolute bottom-10 right-10 w-96 h-96 bg-blue-300 rounded-full blur-3xl"></div>
+  </div>
+  <div class="relative max-w-7xl mx-auto px-4 py-20 sm:py-28">
+    <div class="max-w-3xl">
+      <div class="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2 text-sm font-medium mb-6">
+        <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+        {{ total_books }} ta kitob mavjud
+      </div>
+      <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight mb-6">
+        Bilim dunyosiga<br>
+        <span class="text-yellow-300">xush kelibsiz!</span>
+      </h1>
+      <p class="text-lg sm:text-xl text-blue-100 mb-8 max-w-2xl">
+        Minglab kitoblar, PDF fayllar va bilim manbalari bir joyda. Qidiring, o'qing va bilimingizni oshiring.
+      </p>
+      <div class="flex flex-col sm:flex-row gap-4">
+        <a href="/books/" class="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white text-blue-700 font-bold rounded-2xl hover:bg-blue-50 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+          </svg>
+          Kitoblarni ko'rish
+        </a>
+        {% if not user.is_authenticated %}
+        <a href="/auth/register/" class="inline-flex items-center justify-center gap-2 px-8 py-4 bg-transparent border-2 border-white text-white font-bold rounded-2xl hover:bg-white/10 transition-all">
+          Ro'yxatdan o'tish
+        </a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats bar -->
+  <div class="relative bg-white/10 backdrop-blur-sm border-t border-white/20">
+    <div class="max-w-7xl mx-auto px-4 py-4">
+      <div class="grid grid-cols-3 gap-4 text-center">
+        <div>
+          <div class="text-2xl font-bold">{{ total_books }}</div>
+          <div class="text-blue-200 text-sm">Kitoblar</div>
+        </div>
+        <div>
+          <div class="text-2xl font-bold">{{ total_users }}</div>
+          <div class="text-blue-200 text-sm">Foydalanuvchilar</div>
+        </div>
+        <div>
+          <div class="text-2xl font-bold">{{ available_books }}</div>
+          <div class="text-blue-200 text-sm">Mavjud kitoblar</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Recently Added Books -->
+<section class="max-w-7xl mx-auto px-4 py-16">
+  <div class="flex items-center justify-between mb-8">
+    <div>
+      <h2 class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">Yangi qo'shilgan kitoblar</h2>
+      <p class="text-gray-500 dark:text-gray-400 mt-1">Eng so'nggi qo'shilgan kitoblar</p>
+    </div>
+    <a href="/books/" class="flex items-center gap-1 text-blue-600 dark:text-blue-400 font-medium hover:underline text-sm">
+      Barchasini ko'rish
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+      </svg>
+    </a>
+  </div>
+
+  {% if recently_added %}
+  <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-4 sm:gap-6">
+    {% for book in recently_added %}
+    <a href="/books/{{ book.pk }}/" class="book-card bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl border border-gray-100 dark:border-gray-700 group">
+      <div class="aspect-[3/4] bg-gradient-to-br from-blue-100 to-indigo-100 dark:from-gray-700 dark:to-gray-600 relative overflow-hidden">
+        {% if book.image %}
+          <img src="{{ book.image.url }}" alt="{{ book.title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+        {% else %}
+          <div class="w-full h-full flex items-center justify-center">
+            <svg class="w-16 h-16 text-blue-300 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+            </svg>
+          </div>
+        {% endif %}
+        <!-- Availability badge -->
+        <div class="absolute top-2 right-2">
+          {% if book.available %}
+            <span class="bg-green-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">Mavjud</span>
+          {% else %}
+            <span class="bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">Band</span>
+          {% endif %}
+        </div>
+      </div>
+      <div class="p-3">
+        <h3 class="font-semibold text-gray-900 dark:text-white text-sm line-clamp-2 leading-tight">{{ book.title }}</h3>
+        <p class="text-gray-500 dark:text-gray-400 text-xs mt-1 truncate">{{ book.author }}</p>
+        <span class="inline-block mt-2 text-xs bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 px-2 py-0.5 rounded-full">{{ book.category.name }}</span>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="text-center py-16 text-gray-400 dark:text-gray-500">
+    <svg class="w-16 h-16 mx-auto mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+    </svg>
+    <p>Hozircha kitoblar yo'q</p>
+  </div>
+  {% endif %}
+</section>
+
+<!-- Most Popular Books -->
+{% if most_popular %}
+<section class="bg-gray-100 dark:bg-gray-800/50 py-16">
+  <div class="max-w-7xl mx-auto px-4">
+    <div class="flex items-center justify-between mb-8">
+      <div>
+        <h2 class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">Eng mashhur kitoblar</h2>
+        <p class="text-gray-500 dark:text-gray-400 mt-1">Ko'p o'qilgan kitoblar</p>
+      </div>
+      <a href="/books/" class="flex items-center gap-1 text-blue-600 dark:text-blue-400 font-medium hover:underline text-sm">
+        Barchasini ko'rish
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+        </svg>
+      </a>
+    </div>
+
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 sm:gap-6">
+      {% for book in most_popular %}
+      <a href="/books/{{ book.pk }}/" class="book-card bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl border border-gray-100 dark:border-gray-700 group">
+        <div class="aspect-[3/4] bg-gradient-to-br from-purple-100 to-pink-100 dark:from-gray-700 dark:to-gray-600 relative overflow-hidden">
+          {% if book.image %}
+            <img src="{{ book.image.url }}" alt="{{ book.title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+          {% else %}
+            <div class="w-full h-full flex items-center justify-center">
+              <svg class="w-16 h-16 text-purple-300 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+              </svg>
+            </div>
+          {% endif %}
+          <div class="absolute top-2 left-2">
+            <span class="bg-yellow-400 text-yellow-900 text-xs font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+              🔥 {{ book.borrow_count }}
+            </span>
+          </div>
+          <div class="absolute top-2 right-2">
+            {% if book.available %}
+              <span class="bg-green-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">Mavjud</span>
+            {% else %}
+              <span class="bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">Band</span>
+            {% endif %}
+          </div>
+        </div>
+        <div class="p-3">
+          <h3 class="font-semibold text-gray-900 dark:text-white text-sm line-clamp-2 leading-tight">{{ book.title }}</h3>
+          <p class="text-gray-500 dark:text-gray-400 text-xs mt-1 truncate">{{ book.author }}</p>
+          <span class="inline-block mt-2 text-xs bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 px-2 py-0.5 rounded-full">{{ book.category.name }}</span>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- Categories section -->
+{% if categories %}
+<section class="max-w-7xl mx-auto px-4 py-16">
+  <h2 class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-8">Kategoriyalar</h2>
+  <div class="flex flex-wrap gap-3">
+    {% for cat in categories %}
+    <a href="/books/?category={{ cat.pk }}" class="flex items-center gap-2 px-5 py-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl text-gray-700 dark:text-gray-300 hover:border-blue-400 hover:text-blue-600 dark:hover:text-blue-400 transition-all shadow-sm hover:shadow-md font-medium text-sm">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+      </svg>
+      {{ cat.name }}
+    </a>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+{% endblock %}

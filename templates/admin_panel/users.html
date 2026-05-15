@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block title %}Foydalanuvchilar — Admin{% endblock %}
+{% block content %}
+<div class="flex min-h-screen">
+  {% include "partials/sidebar.html" %}
+  <div class="flex-1 p-6 lg:p-8 overflow-auto">
+    <div class="max-w-5xl mx-auto">
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">Foydalanuvchilar</h1>
+      <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead class="bg-gray-50 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-700">
+              <tr>
+                <th class="text-left px-4 py-3 font-semibold text-gray-600 dark:text-gray-300">Foydalanuvchi</th>
+                <th class="text-left px-4 py-3 font-semibold text-gray-600 dark:text-gray-300">Telefon</th>
+                <th class="text-left px-4 py-3 font-semibold text-gray-600 dark:text-gray-300">Email</th>
+                <th class="text-left px-4 py-3 font-semibold text-gray-600 dark:text-gray-300">Holat</th>
+                <th class="text-left px-4 py-3 font-semibold text-gray-600 dark:text-gray-300">Amal</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
+              {% for u in users %}
+              <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors">
+                <td class="px-4 py-3">
+                  <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                      {{ u.first_name|first|upper }}
+                    </div>
+                    <div>
+                      <p class="font-medium text-gray-900 dark:text-white">{{ u.first_name }} {{ u.last_name }}</p>
+                      {% if u.is_staff %}<span class="text-xs text-purple-500">Admin</span>{% endif %}
+                    </div>
+                  </div>
+                </td>
+                <td class="px-4 py-3 text-gray-600 dark:text-gray-300">{{ u.phone_number }}</td>
+                <td class="px-4 py-3 text-gray-600 dark:text-gray-300 truncate max-w-[180px]">{{ u.email }}</td>
+                <td class="px-4 py-3">
+                  {% if u.is_active %}
+                    <span class="text-xs font-semibold bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 px-2 py-1 rounded-full">Faol</span>
+                  {% else %}
+                    <span class="text-xs font-semibold bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 px-2 py-1 rounded-full">Faolsiz</span>
+                  {% endif %}
+                </td>
+                <td class="px-4 py-3">
+                  {% if not u.is_superuser %}
+                  <form method="post" action="/admin-panel/users/" class="inline">
+                    {% csrf_token %}
+                    <input type="hidden" name="user_id" value="{{ u.pk }}">
+                    {% if u.is_active %}
+                      <input type="hidden" name="action" value="deactivate">
+                      <button type="submit" class="text-xs font-semibold text-red-500 hover:text-red-700 transition-colors">Bloklash</button>
+                    {% else %}
+                      <input type="hidden" name="action" value="activate">
+                      <button type="submit" class="text-xs font-semibold text-green-500 hover:text-green-700 transition-colors">Faollashtirish</button>
+                    {% endif %}
+                  </form>
+                  {% endif %}
+                </td>
+              </tr>
+              {% empty %}
+              <tr><td colspan="5" class="text-center py-10 text-gray-400">Foydalanuvchilar yo'q</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% if page_obj.paginator.num_pages > 1 %}
+        <div class="px-4 py-3 border-t border-gray-100 dark:border-gray-700 flex items-center justify-between text-sm text-gray-500">
+          <span>{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+          <div class="flex gap-2">
+            {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}" class="px-3 py-1 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">Oldingi</a>{% endif %}
+            {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}" class="px-3 py-1 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">Keyingi</a>{% endif %}
+          </div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

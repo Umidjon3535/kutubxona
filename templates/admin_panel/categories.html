@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}Kategoriyalar — Admin{% endblock %}
+{% block content %}
+<div class="flex min-h-screen">
+  {% include "partials/sidebar.html" %}
+  <div class="flex-1 p-6 lg:p-8 overflow-auto">
+    <div class="max-w-3xl mx-auto">
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">Kategoriyalar</h1>
+
+      <!-- Add category form -->
+      <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-5 mb-6">
+        <h3 class="font-semibold text-gray-900 dark:text-white mb-4">Yangi kategoriya qo'shish</h3>
+        <form method="post" action="/admin-panel/categories/">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="create">
+          <div class="flex gap-3">
+            {{ form.name }}
+            <button type="submit" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-colors text-sm flex-shrink-0">
+              Qo'shish
+            </button>
+          </div>
+          {% if form.name.errors %}
+            <p class="text-red-500 text-xs mt-2">{{ form.name.errors.0 }}</p>
+          {% endif %}
+        </form>
+      </div>
+
+      <!-- Categories list -->
+      <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+        <div class="divide-y divide-gray-100 dark:divide-gray-700">
+          {% for cat in categories %}
+          <div class="flex items-center gap-4 px-5 py-4 hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors">
+            <div class="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
+              <svg class="w-4 h-4 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
+            </div>
+            <div class="flex-1">
+              <p class="font-medium text-gray-900 dark:text-white">{{ cat.name }}</p>
+              <p class="text-xs text-gray-400">{{ cat.book_count }} ta kitob</p>
+            </div>
+            <form method="post" action="/admin-panel/categories/" onsubmit="return confirm('{{ cat.name }} kategoriyasini o\'chirishni tasdiqlaysizmi?')">
+              {% csrf_token %}
+              <input type="hidden" name="action" value="delete">
+              <input type="hidden" name="category_id" value="{{ cat.pk }}">
+              {% if cat.book_count > 0 %}
+              <input type="hidden" name="confirm_delete" value="yes">
+              {% endif %}
+              <button type="submit" class="text-xs text-red-500 hover:text-red-700 font-medium transition-colors">O'chirish</button>
+            </form>
+          </div>
+          {% empty %}
+          <div class="text-center py-10 text-gray-400">
+            <p>Hali kategoriyalar yo'q</p>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

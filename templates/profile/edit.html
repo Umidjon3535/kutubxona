@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}Profilni tahrirlash — Online Kutubxona{% endblock %}
+
+{% block content %}
+<div class="max-w-lg mx-auto px-4 py-8">
+  <div class="bg-white dark:bg-gray-800 rounded-3xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+    <div class="bg-gradient-to-br from-blue-600 to-indigo-700 px-8 py-6 text-white">
+      <h1 class="text-xl font-bold">Profilni tahrirlash</h1>
+      <p class="text-blue-200 text-sm mt-1">Ma'lumotlaringizni yangilang</p>
+    </div>
+    <div class="px-8 py-8">
+      <form method="post" action="/profile/edit/" data-loading>
+        {% csrf_token %}
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ form.first_name.label }}</label>
+            {{ form.first_name }}
+            {% if form.first_name.errors %}<p class="text-red-500 text-xs mt-1">{{ form.first_name.errors.0 }}</p>{% endif %}
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ form.last_name.label }}</label>
+            {{ form.last_name }}
+            {% if form.last_name.errors %}<p class="text-red-500 text-xs mt-1">{{ form.last_name.errors.0 }}</p>{% endif %}
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ form.email.label }}</label>
+            {{ form.email }}
+            {% if form.email.errors %}<p class="text-red-500 text-xs mt-1">{{ form.email.errors.0 }}</p>{% endif %}
+          </div>
+        </div>
+        <div class="flex gap-3 mt-6">
+          <button type="submit" class="flex-1 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-colors">
+            Saqlash
+          </button>
+          <a href="/profile/" class="flex-1 py-3 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 font-bold rounded-xl transition-colors text-center">
+            Bekor qilish
+          </a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

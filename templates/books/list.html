@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+
+{% block title %}Kitoblar — Online Kutubxona{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 py-8">
+
+  <!-- Page header -->
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Kitoblar katalogi</h1>
+    <p class="text-gray-500 dark:text-gray-400 mt-1">
+      {% if total_count %}{{ total_count }} ta kitob topildi{% else %}Kitoblar ro'yxati{% endif %}
+    </p>
+  </div>
+
+  <!-- Search & Filter bar -->
+  <form method="get" action="/books/" class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 mb-8">
+    <div class="flex flex-col sm:flex-row gap-3">
+      <!-- Search input -->
+      <div class="relative flex-1">
+        <input type="text" name="q" value="{{ query }}"
+          placeholder="Kitob sarlavhasi yoki muallif..."
+          class="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+        <svg class="absolute left-3 top-3.5 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+        </svg>
+      </div>
+
+      <!-- Category filter -->
+      <select name="category"
+        class="px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm min-w-[180px]">
+        <option value="">Barcha kategoriyalar</option>
+        {% for cat in categories %}
+          <option value="{{ cat.pk }}" {% if selected_category == cat.pk|stringformat:"s" %}selected{% endif %}>
+            {{ cat.name }}
+          </option>
+        {% endfor %}
+      </select>
+
+      <!-- Submit -->
+      <button type="submit" class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-colors shadow-sm flex items-center gap-2">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+        </svg>
+        Qidirish
+      </button>
+
+      {% if query or selected_category %}
+      <a href="/books/" class="px-4 py-3 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-300 font-medium rounded-xl transition-colors text-sm flex items-center gap-1">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+        Tozalash
+      </a>
+      {% endif %}
+    </div>
+  </form>
+
+  <!-- Admin add button -->
+  {% if user.is_staff %}
+  <div class="mb-6">
+    <a href="/admin-panel/books/create/" class="inline-flex items-center gap-2 px-5 py-2.5 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-xl transition-colors shadow-sm">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+      </svg>
+      Yangi kitob qo'shish
+    </a>
+  </div>
+  {% endif %}
+
+  <!-- Books grid -->
+  {% if books %}
+  <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-6 gap-4 sm:gap-5">
+    {% for book in books %}
+    <a href="/books/{{ book.pk }}/" class="book-card bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl border border-gray-100 dark:border-gray-700 group flex flex-col">
+      <!-- Book cover -->
+      <div class="aspect-[3/4] bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-700 dark:to-gray-600 relative overflow-hidden">
+        {% if book.image %}
+          <img src="{{ book.image.url }}" alt="{{ book.title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+        {% else %}
+          <div class="w-full h-full flex flex-col items-center justify-center gap-2 p-3">
+            <svg class="w-12 h-12 text-blue-300 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+            </svg>
+          </div>
+        {% endif %}
+        <!-- Availability badge -->
+        <div class="absolute top-2 right-2">
+          {% if book.available %}
+            <span class="bg-green-500 text-white text-xs font-bold px-2 py-0.5 rounded-full shadow">Mavjud</span>
+          {% else %}
+            <span class="bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full shadow">Band</span>
+          {% endif %}
+        </div>
+        {% if book.pdf_file %}
+        <div class="absolute bottom-2 left-2">
+          <span class="bg-orange-500 text-white text-xs font-bold px-2 py-0.5 rounded-full shadow">PDF</span>
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- Book info -->
+      <div class="p-3 flex flex-col flex-1">
+        <h3 class="font-semibold text-gray-900 dark:text-white text-sm line-clamp-2 leading-tight flex-1">{{ book.title }}</h3>
+        <p class="text-gray-500 dark:text-gray-400 text-xs mt-1 truncate">{{ book.author }}</p>
+        <span class="inline-block mt-2 text-xs bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 px-2 py-0.5 rounded-full truncate">{{ book.category.name }}</span>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+
+  <!-- Pagination -->
+  {% if page_obj.paginator.num_pages > 1 %}
+  <div class="mt-10 flex items-center justify-center gap-2 flex-wrap">
+    <!-- Previous -->
+    {% if page_obj.has_previous %}
+    <a href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}"
+      class="flex items-center gap-1 px-4 py-2 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm font-medium shadow-sm">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+      </svg>
+      Oldingi
+    </a>
+    {% endif %}
+
+    <!-- Page numbers -->
+    {% for num in page_obj.paginator.page_range %}
+      {% if page_obj.number == num %}
+        <span class="px-4 py-2 rounded-xl bg-blue-600 text-white font-bold text-sm shadow-sm">{{ num }}</span>
+      {% elif num > page_obj.number|add:"-3" and num < page_obj.number|add:"3" %}
+        <a href="?page={{ num }}{% if query %}&q={{ query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}"
+          class="px-4 py-2 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm font-medium shadow-sm">
+          {{ num }}
+        </a>
+      {% endif %}
+    {% endfor %}
+
+    <!-- Next -->
+    {% if page_obj.has_next %}
+    <a href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}"
+      class="flex items-center gap-1 px-4 py-2 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm font-medium shadow-sm">
+      Keyingi
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+      </svg>
+    </a>
+    {% endif %}
+
+    <!-- Page info -->
+    <span class="text-gray-500 dark:text-gray-400 text-sm ml-2">
+      {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}
+    </span>
+  </div>
+  {% endif %}
+
+  {% else %}
+  <!-- No results -->
+  <div class="text-center py-20">
+    <div class="w-24 h-24 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-6">
+      <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+      </svg>
+    </div>
+    <h3 class="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-2">Kitob topilmadi</h3>
+    <p class="text-gray-500 dark:text-gray-400 mb-6">
+      {% if query %}"{{ query }}" bo'yicha hech narsa topilmadi.{% else %}Hozircha kitoblar yo'q.{% endif %}
+    </p>
+    <a href="/books/" class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-colors">
+      Barcha kitoblarni ko'rish
+    </a>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

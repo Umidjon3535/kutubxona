@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block title %}Ro'yxatdan o'tish — Online Kutubxona{% endblock %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center py-12 px-4">
+  <div class="w-full max-w-md">
+
+    <!-- Card -->
+    <div class="bg-white dark:bg-gray-800 rounded-3xl shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+
+      <!-- Header -->
+      <div class="bg-gradient-to-br from-blue-600 to-indigo-700 px-8 py-8 text-center">
+        <div class="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
+          <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+          </svg>
+        </div>
+        <h1 class="text-2xl font-bold text-white">Ro'yxatdan o'tish</h1>
+        <p class="text-blue-200 text-sm mt-1">Kutubxonaga qo'shiling</p>
+      </div>
+
+      <!-- Form -->
+      <div class="px-8 py-8">
+        <form method="post" action="/auth/register/" data-loading>
+          {% csrf_token %}
+
+          <!-- Non-field errors -->
+          {% if form.non_field_errors %}
+          <div class="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl">
+            {% for error in form.non_field_errors %}
+              <p class="text-red-600 dark:text-red-400 text-sm">{{ error }}</p>
+            {% endfor %}
+          </div>
+          {% endif %}
+
+          <div class="space-y-4">
+            <!-- First name & Last name -->
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ form.first_name.label }}</label>
+                {{ form.first_name }}
+                {% if form.first_name.errors %}
+                  <p class="text-red-500 text-xs mt-1">{{ form.first_name.errors.0 }}</p>
+                {% endif %}
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ form.last_name.label }}</label>
+                {{ form.last_name }}
+                {% if form.last_name.errors %}
+                  <p class="text-red-500 text-xs mt-1">{{ form.last_name.errors.0 }}</p>
+                {% endif %}
+              </div>
+            </div>
+
+            <!-- Email -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ form.email.label }}</label>
+              {{ form.email }}
+              {% if form.email.errors %}
+                <p class="text-red-500 text-xs mt-1">{{ form.email.errors.0 }}</p>
+              {% endif %}
+            </div>
+
+            <!-- Phone -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ form.phone_number.label }}</label>
+              {{ form.phone_number }}
+              {% if form.phone_number.errors %}
+                <p class="text-red-500 text-xs mt-1">{{ form.phone_number.errors.0 }}</p>
+              {% endif %}
+            </div>
+
+            <!-- Password -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ form.password.label }}</label>
+              {{ form.password }}
+              {% if form.password.errors %}
+                <p class="text-red-500 text-xs mt-1">{{ form.password.errors.0 }}</p>
+              {% endif %}
+            </div>
+
+            <!-- Password confirm -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ form.password_confirm.label }}</label>
+              {{ form.password_confirm }}
+              {% if form.password_confirm.errors %}
+                <p class="text-red-500 text-xs mt-1">{{ form.password_confirm.errors.0 }}</p>
+              {% endif %}
+            </div>
+          </div>
+
+          <button type="submit" class="w-full mt-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-colors shadow-sm hover:shadow-md text-sm">
+            Ro'yxatdan o'tish
+          </button>
+        </form>
+
+        <p class="text-center text-sm text-gray-500 dark:text-gray-400 mt-6">
+          Hisobingiz bormi?
+          <a href="/auth/login/" class="text-blue-600 dark:text-blue-400 font-semibold hover:underline">Kirish</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

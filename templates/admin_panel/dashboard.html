@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard — Online Kutubxona{% endblock %}
+
+{% block content %}
+<div class="flex min-h-screen">
+  {% include "partials/sidebar.html" %}
+
+  <div class="flex-1 p-6 lg:p-8 overflow-auto">
+    <div class="max-w-6xl mx-auto">
+
+      <!-- Header -->
+      <div class="mb-8">
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
+        <p class="text-gray-500 dark:text-gray-400 mt-1">Tizim statistikasi</p>
+      </div>
+
+      <!-- Stats cards -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-sm border border-gray-200 dark:border-gray-700">
+          <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-xl flex items-center justify-center">
+              <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+            </div>
+          </div>
+          <div class="text-3xl font-bold text-gray-900 dark:text-white">{{ total_books }}</div>
+          <div class="text-sm text-gray-500 dark:text-gray-400 mt-1">Jami kitoblar</div>
+        </div>
+
+        <div class="bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-sm border border-gray-200 dark:border-gray-700">
+          <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 bg-green-100 dark:bg-green-900/30 rounded-xl flex items-center justify-center">
+              <svg class="w-5 h-5 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+            </div>
+          </div>
+          <div class="text-3xl font-bold text-gray-900 dark:text-white">{{ total_users }}</div>
+          <div class="text-sm text-gray-500 dark:text-gray-400 mt-1">Foydalanuvchilar</div>
+        </div>
+
+        <div class="bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-sm border border-gray-200 dark:border-gray-700">
+          <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 bg-orange-100 dark:bg-orange-900/30 rounded-xl flex items-center justify-center">
+              <svg class="w-5 h-5 text-orange-600 dark:text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+            </div>
+          </div>
+          <div class="text-3xl font-bold text-gray-900 dark:text-white">{{ active_borrows }}</div>
+          <div class="text-sm text-gray-500 dark:text-gray-400 mt-1">Faol ijaralar</div>
+        </div>
+
+        <div class="bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-sm border border-gray-200 dark:border-gray-700">
+          <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 bg-purple-100 dark:bg-purple-900/30 rounded-xl flex items-center justify-center">
+              <svg class="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
+          </div>
+          <div class="text-3xl font-bold text-gray-900 dark:text-white">{{ available_books }}</div>
+          <div class="text-sm text-gray-500 dark:text-gray-400 mt-1">Mavjud kitoblar</div>
+        </div>
+      </div>
+
+      <!-- Quick actions -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-sm border border-gray-200 dark:border-gray-700">
+          <h3 class="font-bold text-gray-900 dark:text-white mb-4">Tezkor amallar</h3>
+          <div class="space-y-2">
+            <a href="/admin-panel/books/create/" class="flex items-center gap-3 p-3 rounded-xl bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors text-sm font-medium">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+              Yangi kitob qo'shish
+            </a>
+            <a href="/admin-panel/categories/" class="flex items-center gap-3 p-3 rounded-xl bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/30 transition-colors text-sm font-medium">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
+              Kategoriya boshqarish
+            </a>
+            <a href="/admin-panel/users/" class="flex items-center gap-3 p-3 rounded-xl bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-400 hover:bg-purple-100 dark:hover:bg-purple-900/30 transition-colors text-sm font-medium">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+              Foydalanuvchilar
+            </a>
+          </div>
+        </div>
+
+        <!-- Recent borrows -->
+        <div class="bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-sm border border-gray-200 dark:border-gray-700">
+          <h3 class="font-bold text-gray-900 dark:text-white mb-4">So'nggi ijaralar</h3>
+          {% if recent_borrows %}
+          <div class="space-y-2">
+            {% for borrow in recent_borrows|slice:":5" %}
+            <div class="flex items-center gap-3 text-sm">
+              <div class="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center text-blue-600 dark:text-blue-400 font-bold text-xs flex-shrink-0">
+                {{ borrow.user.first_name|first|upper }}
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="font-medium text-gray-900 dark:text-white truncate">{{ borrow.book.title }}</p>
+                <p class="text-gray-400 text-xs">{{ borrow.user.first_name }} · {{ borrow.borrowed_at|date:"d.m.Y" }}</p>
+              </div>
+              {% if borrow.returned %}
+                <span class="text-xs text-gray-400 flex-shrink-0">Qaytarilgan</span>
+              {% else %}
+                <span class="text-xs text-blue-500 flex-shrink-0">Ijarada</span>
+              {% endif %}
+            </div>
+            {% endfor %}
+          </div>
+          {% else %}
+          <p class="text-gray-400 text-sm">Hali ijara yo'q</p>
+          {% endif %}
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}
